@@ -1,0 +1,385 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Funny Moving Button</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: white;
+            font-family: Arial, sans-serif;
+        }
+
+        #clickButton {
+            position: absolute;
+
+            padding: 18px 35px;
+
+            font-size: 22px;
+            font-weight: bold;
+
+            border: none;
+            border-radius: 10px;
+
+            background: black;
+            color: white;
+
+            cursor: pointer;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
+
+            transition:
+                left 0.3s ease,
+                top 0.3s ease,
+                transform 0.1s ease;
+        }
+
+        #clickButton:hover {
+            background: #333;
+        }
+
+        #clickButton:active {
+            transform: scale(0.9);
+        }
+
+        #counter {
+            position: fixed;
+
+            top: 20px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            font-size: 20px;
+            font-weight: bold;
+
+            color: #222;
+        }
+
+        #message {
+            position: fixed;
+
+            bottom: 30px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            font-size: 24px;
+            font-weight: bold;
+
+            color: #222;
+
+            opacity: 0;
+
+            transition: opacity 0.3s ease;
+        }
+
+        #message.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="counter">
+        Clicks: 0
+    </div>
+
+    <div id="message">
+        💨 HAHAHA!
+    </div>
+
+    <button id="clickButton">
+        CLICK ME
+    </button>
+
+
+    <script>
+
+        // ==========================================
+        // CLICK COUNTER
+        // ==========================================
+
+        let clicks = 0;
+
+
+        // ==========================================
+        // GET HTML ELEMENTS
+        // ==========================================
+
+        const button = document.getElementById("clickButton");
+
+        const counter = document.getElementById("counter");
+
+        const message = document.getElementById("message");
+
+
+        // ==========================================
+        // WHEN BUTTON IS CLICKED
+        // ==========================================
+
+        button.addEventListener("click", function() {
+
+            // Increase the click counter
+            clicks++;
+
+            // Update the text at the top
+            counter.textContent = "Clicks: " + clicks;
+
+
+            // Move the button
+            moveButton();
+
+
+            // ======================================
+            // EVERY 3 CLICKS
+            // ======================================
+
+            if (clicks % 3 === 0) {
+
+                playFunnySound();
+
+                showFunnyMessage();
+
+            }
+
+        });
+
+
+        // ==========================================
+        // MOVE BUTTON
+        // ==========================================
+
+        function moveButton() {
+
+            // Screen dimensions
+            const screenWidth = window.innerWidth;
+
+            const screenHeight = window.innerHeight;
+
+
+            // Button dimensions
+            const buttonWidth = button.offsetWidth;
+
+            const buttonHeight = button.offsetHeight;
+
+
+            // Keep button inside the screen
+            const maxX = screenWidth - buttonWidth;
+
+            const maxY = screenHeight - buttonHeight;
+
+
+            // Random position
+            const randomX =
+                Math.random() * maxX;
+
+            const randomY =
+                Math.random() * maxY;
+
+
+            // Move button
+            button.style.left =
+                randomX + "px";
+
+            button.style.top =
+                randomY + "px";
+
+
+            // Remove original centering
+            button.style.transform =
+                "none";
+        }
+
+
+        // ==========================================
+        // FUNNY SOUND
+        // ==========================================
+
+        function playFunnySound() {
+
+            /*
+                We create the sound directly
+                inside the browser.
+
+                No MP3 file is required.
+            */
+
+            const audioContext =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+
+
+            // Create oscillator
+            const oscillator =
+                audioContext.createOscillator();
+
+
+            // Create volume control
+            const gain =
+                audioContext.createGain();
+
+
+            // Connect sound
+            oscillator.connect(gain);
+
+            gain.connect(
+                audioContext.destination
+            );
+
+
+            // ======================================
+            // FUNNY SOUND EFFECT
+            // ======================================
+
+            const now =
+                audioContext.currentTime;
+
+
+            // Start low
+            oscillator.frequency.setValueAtTime(
+                180,
+                now
+            );
+
+
+            // Drop frequency
+            oscillator.frequency.exponentialRampToValueAtTime(
+                55,
+                now + 1.2
+            );
+
+
+            // Rise again
+            oscillator.frequency.exponentialRampToValueAtTime(
+                140,
+                now + 2.2
+            );
+
+
+            // Drop again
+            oscillator.frequency.exponentialRampToValueAtTime(
+                45,
+                now + 3.5
+            );
+
+
+            // Final rise
+            oscillator.frequency.exponentialRampToValueAtTime(
+                80,
+                now + 4.8
+            );
+
+
+            // ======================================
+            // VOLUME
+            // ======================================
+
+            gain.gain.setValueAtTime(
+                0.01,
+                now
+            );
+
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.7,
+                now + 0.2
+            );
+
+
+            gain.gain.setValueAtTime(
+                0.6,
+                now + 2
+            );
+
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.01,
+                now + 5
+            );
+
+
+            // Start sound
+            oscillator.start(now);
+
+
+            // Stop after approximately 5 seconds
+            oscillator.stop(
+                now + 5
+            );
+
+        }
+
+
+        // ==========================================
+        // FUNNY MESSAGE
+        // ==========================================
+
+        function showFunnyMessage() {
+
+            message.classList.add("show");
+
+
+            // Change message randomly
+            const messages = [
+
+                "💨 BRRRRRAAAPPP!",
+
+                "😂 YOU FOUND THE SOUND!",
+
+                "💨 PFFFFFFFFT!",
+
+                "🤣 WHAT WAS THAT?!",
+
+                "💨 TOOOOOT!",
+
+                "😭 WHO DID THAT?!"
+
+            ];
+
+
+            const randomMessage =
+                messages[
+                    Math.floor(
+                        Math.random() *
+                        messages.length
+                    )
+                ];
+
+
+            message.textContent =
+                randomMessage;
+
+
+            // Hide message after 5 seconds
+            setTimeout(function() {
+
+                message.classList.remove("show");
+
+            }, 5000);
+
+        }
+
+    </script>
+
+</body>
+</html>
+```
+ 
